@@ -34,7 +34,7 @@
             btnPlanilhaPadrao = new Button();
             btnImportar = new Button();
             pnBotoes = new Panel();
-            btnImprimirEtiqueta = new Button();
+            btnEnviarEtiquetas = new Button();
             dgvEtiquetas = new DataGridView();
             gbDadosNovo = new GroupBox();
             btnExcluir = new Button();
@@ -93,7 +93,7 @@
             gbImportacao.Location = new Point(647, 6);
             gbImportacao.Name = "gbImportacao";
             gbImportacao.Size = new Size(123, 144);
-            gbImportacao.TabIndex = 17;
+            gbImportacao.TabIndex = 1;
             gbImportacao.TabStop = false;
             gbImportacao.Text = "Importação";
             // 
@@ -118,21 +118,21 @@
             // pnBotoes
             // 
             pnBotoes.BackColor = SystemColors.ButtonShadow;
-            pnBotoes.Controls.Add(btnImprimirEtiqueta);
+            pnBotoes.Controls.Add(btnEnviarEtiquetas);
             pnBotoes.Dock = DockStyle.Bottom;
             pnBotoes.Location = new Point(3, 372);
             pnBotoes.Name = "pnBotoes";
             pnBotoes.Size = new Size(774, 47);
-            pnBotoes.TabIndex = 16;
+            pnBotoes.TabIndex = 3;
             // 
-            // btnImprimirEtiqueta
+            // btnEnviarEtiquetas
             // 
-            btnImprimirEtiqueta.Location = new Point(346, 3);
-            btnImprimirEtiqueta.Name = "btnImprimirEtiqueta";
-            btnImprimirEtiqueta.Size = new Size(94, 39);
-            btnImprimirEtiqueta.TabIndex = 1;
-            btnImprimirEtiqueta.Text = "Imprimir";
-            btnImprimirEtiqueta.UseVisualStyleBackColor = true;
+            btnEnviarEtiquetas.Location = new Point(346, 3);
+            btnEnviarEtiquetas.Name = "btnEnviarEtiquetas";
+            btnEnviarEtiquetas.Size = new Size(94, 39);
+            btnEnviarEtiquetas.TabIndex = 1;
+            btnEnviarEtiquetas.Text = "Enviar";
+            btnEnviarEtiquetas.UseVisualStyleBackColor = true;
             // 
             // dgvEtiquetas
             // 
@@ -142,7 +142,7 @@
             dgvEtiquetas.Location = new Point(8, 156);
             dgvEtiquetas.Name = "dgvEtiquetas";
             dgvEtiquetas.Size = new Size(762, 210);
-            dgvEtiquetas.TabIndex = 15;
+            dgvEtiquetas.TabIndex = 2;
             // 
             // gbDadosNovo
             // 
@@ -164,7 +164,7 @@
             gbDadosNovo.Location = new Point(8, 6);
             gbDadosNovo.Name = "gbDadosNovo";
             gbDadosNovo.Size = new Size(633, 144);
-            gbDadosNovo.TabIndex = 14;
+            gbDadosNovo.TabIndex = 0;
             gbDadosNovo.TabStop = false;
             gbDadosNovo.Text = "Dados da Etiqueta";
             // 
@@ -173,7 +173,7 @@
             btnExcluir.Location = new Point(398, 113);
             btnExcluir.Name = "btnExcluir";
             btnExcluir.Size = new Size(77, 23);
-            btnExcluir.TabIndex = 14;
+            btnExcluir.TabIndex = 7;
             btnExcluir.Text = "Excluir";
             btnExcluir.UseVisualStyleBackColor = true;
             // 
@@ -182,16 +182,18 @@
             btnSalvar.Location = new Point(315, 113);
             btnSalvar.Name = "btnSalvar";
             btnSalvar.Size = new Size(77, 23);
-            btnSalvar.TabIndex = 2;
+            btnSalvar.TabIndex = 6;
             btnSalvar.Text = "Salvar";
             btnSalvar.UseVisualStyleBackColor = true;
             // 
             // txtDataCalibracao
             // 
             txtDataCalibracao.Location = new Point(6, 84);
+            txtDataCalibracao.MaxLength = 10;
             txtDataCalibracao.Name = "txtDataCalibracao";
             txtDataCalibracao.Size = new Size(90, 23);
-            txtDataCalibracao.TabIndex = 3;
+            txtDataCalibracao.TabIndex = 2;
+            txtDataCalibracao.TextAlign = HorizontalAlignment.Center;
             // 
             // lblPreVisualizacao
             // 
@@ -224,14 +226,16 @@
             txtNroCertificacao.Location = new Point(197, 84);
             txtNroCertificacao.Name = "txtNroCertificacao";
             txtNroCertificacao.Size = new Size(137, 23);
-            txtNroCertificacao.TabIndex = 5;
+            txtNroCertificacao.TabIndex = 4;
             // 
             // txtProximaCalibracao
             // 
             txtProximaCalibracao.Location = new Point(102, 84);
+            txtProximaCalibracao.MaxLength = 10;
             txtProximaCalibracao.Name = "txtProximaCalibracao";
             txtProximaCalibracao.Size = new Size(89, 23);
-            txtProximaCalibracao.TabIndex = 9;
+            txtProximaCalibracao.TabIndex = 3;
+            txtProximaCalibracao.TextAlign = HorizontalAlignment.Center;
             // 
             // lblProximaCalibracao
             // 
@@ -247,7 +251,7 @@
             txtDiretorioLaudo.Location = new Point(6, 36);
             txtDiretorioLaudo.Name = "txtDiretorioLaudo";
             txtDiretorioLaudo.Size = new Size(388, 23);
-            txtDiretorioLaudo.TabIndex = 11;
+            txtDiretorioLaudo.TabIndex = 0;
             // 
             // lblDiretorioLaudo
             // 
@@ -263,7 +267,7 @@
             txtNumeroIdentificacao.Location = new Point(340, 84);
             txtNumeroIdentificacao.Name = "txtNumeroIdentificacao";
             txtNumeroIdentificacao.Size = new Size(135, 23);
-            txtNumeroIdentificacao.TabIndex = 7;
+            txtNumeroIdentificacao.TabIndex = 5;
             // 
             // lblNroIdentificacao
             // 
@@ -288,7 +292,7 @@
             btnVisualizarQRCode.Location = new Point(400, 36);
             btnVisualizarQRCode.Name = "btnVisualizarQRCode";
             btnVisualizarQRCode.Size = new Size(75, 24);
-            btnVisualizarQRCode.TabIndex = 0;
+            btnVisualizarQRCode.TabIndex = 1;
             btnVisualizarQRCode.Text = "Visualizar";
             btnVisualizarQRCode.UseVisualStyleBackColor = true;
             // 
@@ -317,7 +321,7 @@
         }
 
         #endregion
-        internal System.Windows.Forms.Button btnImprimirEtiqueta;
+        internal System.Windows.Forms.Button btnEnviarEtiquetas;
         internal System.Windows.Forms.Button btnVisualizarQRCode;
         internal System.Windows.Forms.TextBox txtDataCalibracao;
         private System.Windows.Forms.Label lblDataCalibracao;

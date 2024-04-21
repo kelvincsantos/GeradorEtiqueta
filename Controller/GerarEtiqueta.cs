@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-using GerarEtiquetas.Forms.Comum;
+using GerarEtiquetas.Comum;
 using System.Linq;
 using Microsoft.VisualBasic;
 using ClosedXML.Excel;
+using GerarEtiquetas.Forms.Comum;
 
 namespace GerarEtiquetas.Forms.Controller
 {
@@ -22,13 +23,22 @@ namespace GerarEtiquetas.Forms.Controller
             this.form = e;
 
             form.btnVisualizarQRCode.Click += btnVisualizarQRCode_Click;
-            form.btnImprimirEtiqueta.Click += BtnImprimirEtiqueta_Click;
+            form.btnEnviarEtiquetas.Click += btnEnviarEtiquetas_Click;
 
             form.btnImportar.Click += btnImportar_Click;
             form.btnPlanilhaPadrao.Click += btnPlanilhaPadrao_Click;
 
             form.btnSalvar.Click += BtnSalvar_Click;
             form.btnExcluir.Click += BtnExcluir_Click;
+
+            form.txtDataCalibracao.KeyPress += Leiaute.TextBox.KeyPress_Data;
+            form.txtDataCalibracao.LostFocus += Leiaute.TextBox.LostFocus_Data;
+
+            form.txtProximaCalibracao.KeyPress += Leiaute.TextBox.KeyPress_Data;
+            form.txtProximaCalibracao.LostFocus += Leiaute.TextBox.LostFocus_Data;
+
+            form.txtNumeroIdentificacao.KeyPress += Leiaute.TextBox.KeyPress_Integer;
+            form.txtNroCertificacao.KeyPress += Leiaute.TextBox.KeyPress_Integer;
 
             form.dgvEtiquetas.DoubleClick += dgvEtiquetas_DoubleClick;
 
@@ -65,7 +75,7 @@ namespace GerarEtiquetas.Forms.Controller
             Visualizar();
         }
 
-        private void BtnImprimirEtiqueta_Click(object? sender, EventArgs e)
+        private void btnEnviarEtiquetas_Click(object? sender, EventArgs e)
         {
             Limpar();
         }
@@ -75,6 +85,7 @@ namespace GerarEtiquetas.Forms.Controller
             form.txtDataCalibracao.Text = string.Empty;
             form.txtDiretorioLaudo.Text = string.Empty;
             form.txtNroCertificacao.Text = string.Empty;
+            form.txtNumeroIdentificacao.Text = string.Empty;
             form.txtProximaCalibracao.Text = string.Empty;
             form.pbPreVisualizacao.Image = null;
             Editando = null;
@@ -117,13 +128,13 @@ namespace GerarEtiquetas.Forms.Controller
 
             List<Telas.Controls.Grid.Column> Columns = new List<Telas.Controls.Grid.Column>();
 
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Pedido Applay", Referencia = "PedidoApp", Tamanho = 50 });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "CPF/CNPJ", Referencia = "Documento", Tamanho = 50 });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nome", Referencia = "NomeCliente", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Qtd. Produto", Referencia = "QuantidadeProdutos", Tamanho = 50, Alinhamento = DataGridViewContentAlignment.MiddleRight });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Vl. Total", Referencia = "ValorProdutos", Tamanho = 50, Alinhamento = DataGridViewContentAlignment.MiddleRight });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Data Calibração", Referencia = "DataCalibracao", Tamanho = 80 });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Próx. Calibração", Referencia = "ProximaCalibracao", Tamanho = 80 });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Certificado", Referencia = "NumeroCertificado", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Identificação", Referencia = "NumeroCertificado", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Laudo", Referencia = "DiretorioLaudo", Tamanho = 500, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
 
-            Telas.Controls.Grid.Init(form.dgvEtiquetas, Columns);
+        Telas.Controls.Grid.Init(form.dgvEtiquetas, Columns);
 
             form.dgvEtiquetas.DataSource = etiquetas;
             form.dgvEtiquetas.Focus();
@@ -177,6 +188,9 @@ namespace GerarEtiquetas.Forms.Controller
             Editando.ProximaCalibracao = Convert.ToDateTime(form.txtProximaCalibracao.Text.Trim());
 
             etiquetas.Add(Editando);
+
+            Limpar();
+            Mostrar();
         }
 
         private void Excluir()

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using GerarEtiquetas.Comum;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace GerarEtiquetas.Forms.Comum
@@ -8,38 +10,76 @@ namespace GerarEtiquetas.Forms.Comum
     {
         public static partial class TextBox
         {
-            public static void KeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+            public static void KeyPress(object? sender, System.Windows.Forms.KeyPressEventArgs e)
             {
                 if (Conversor.EnterToTab(e.KeyChar))
                     e.Handled = true;
             }
 
-            public static void KeyPress_Decimal(object sender, System.Windows.Forms.KeyPressEventArgs e)
+            public static void KeyPress_Decimal(object? sender, System.Windows.Forms.KeyPressEventArgs e)
+            {
+                if (Conversor.EnterToTab(e.KeyChar))
+                    e.Handled = true;
+            }
+
+            public static void KeyPress_Data(object? sender, System.Windows.Forms.KeyPressEventArgs e)
+            {
+                System.Windows.Forms.TextBox? obj = (System.Windows.Forms.TextBox?)sender;
+
+                if (Conversor.EnterToTab(e.KeyChar))
+                    e.Handled = true;
+
+                if (e.KeyChar != (char)Keys.Back)
+                {
+                    if (obj?.Text.Length == 2 || obj?.Text.Length == 5)
+                    {
+                        obj.Text += "/";
+                        obj.SelectionStart = obj.Text.Length + 1;
+                    }
+                }
+            }
+
+            public static void KeyPress_Integer(object? sender, System.Windows.Forms.KeyPressEventArgs e)
             {
                 if (Conversor.EnterToTab(e.KeyChar))
                     e.Handled = true;
 
-
+                if (e.KeyChar != (char)Keys.Back)
+                        e.Handled = !double.TryParse(e.KeyChar.ToString(), NumberStyles.Any, new CultureInfo("pt-BR"), out _);
             }
 
-            public static void KeyPress_Integer(object sender, System.Windows.Forms.KeyPressEventArgs e)
-            {
-                if (Conversor.EnterToTab(e.KeyChar))
-                    e.Handled = true;
-
-
-            }
-
-            public static void KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+            public static void KeyDown(object? sender, System.Windows.Forms.KeyEventArgs e)
             {
                 throw new NotImplementedException();
             }
 
-            public static void LostFocus(object sender, EventArgs e)
+            public static void LostFocus(object? sender, EventArgs e)
             {
                 throw new NotImplementedException();
             }
 
+            public static void LostFocus_Data(object? sender, EventArgs e)
+            {
+                System.Windows.Forms.TextBox? obj = (System.Windows.Forms.TextBox?)sender;
+
+                if (obj == null)
+                    return;
+
+                if (string.IsNullOrWhiteSpace(obj.Text)) return;
+                if (obj.Text == "__/__/____") return;
+
+                DateTime date;
+
+                if (DateTime.TryParse(obj.Text.Trim(), new CultureInfo("pt-BR"), DateTimeStyles.None, out date))
+                    obj.Text = date.ToString("dd/MM/yyyy");
+                else
+                {
+                    Mensagem.Alerta("Data inválida!");
+
+                    obj.Text = "";
+                    obj.Focus();
+                }
+            }
         }
 
         public static partial class ComboBox
@@ -72,6 +112,12 @@ namespace GerarEtiquetas.Forms.Comum
                     e.Width = 1080;
                     e.Height = 720;
                 }
+            }
+
+            public static void Exibir(System.Windows.Forms.Form e)
+            {
+                Carregar(e);
+                e.ShowDialog();
             }
 
             public static void ExibirPequeno(System.Windows.Forms.Form e)

@@ -22,8 +22,18 @@ namespace GerarEtiquetas.Controller
             form.btnLimpar.Click += BtnLimpar_Click;
             form.btnSalvar.Click += BtnSalvar_Click;
 
+            form.txtDadoSolicitado.KeyDown += TxtDadoSolicitado_KeyDown;
+
             Formato = dado;
             Formatar();
+        }
+
+        private void TxtDadoSolicitado_KeyDown(object? sender, KeyEventArgs e)
+        {
+            if(e.KeyCode == Keys.Enter)
+                Salvar();
+            else if(e.KeyCode == Keys.Escape)
+                Cancelar();
         }
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
@@ -43,30 +53,43 @@ namespace GerarEtiquetas.Controller
 
         private void FormatarAssinatura()
         {
+            form.Text = "Assinatura";
             form.lblTextoSolicitado.Text = "Insira a chave de assinatura do sistema:";
             form.btnAcao1.Text = "Gerar nova chave";
             form.btnAcao1.Click += btnGerarChave;
             form.btnAcao1.Visible = true;
         }
 
-        private void BtnAcao1_Click(object? sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
         private void FormatarServidor()
         {
-
+            form.Text = "Servidor de Banco de Dados";
+            form.lblTextoSolicitado.Text = "Insira o endereço do banco de dados do sistema:";
+            form.btnAcao1.Visible = false;
         }
 
         private void FormatarNomeBanco()
         {
-
+            form.Text = "Nome do Banco de Dados";
+            form.lblTextoSolicitado.Text = "Insira o nome do banco de dados do sistema:";
+            form.btnAcao1.Visible = false;
         }
 
         private void FormatarSenhaBanco()
         {
+            form.Text = "Senha do Banco de Dados";
+            form.lblTextoSolicitado.Text = "Insira a senha do banco de dados do sistema:";
+            form.btnAcao1.Visible = false;
+            form.txtDadoSolicitado.PasswordChar = '*';
+        }
 
+        private void FormatarAssinaturaRepresentante()
+        {
+            form.Text = "Assinatura do representante";
+            form.lblTextoSolicitado.Text = "Insira a assinatura:";
+            form.btnAcao1.Visible = true;
+            form.btnAcao1.Text = "Ver Assinatura";
+            form.btnAcao1.Click += btnVerDados;
+            form.txtDadoSolicitado.PasswordChar = '*';
         }
 
         private void Cancelar()
@@ -78,6 +101,14 @@ namespace GerarEtiquetas.Controller
         private void btnGerarChave(object? sender, EventArgs e)
         {
             form.txtDadoSolicitado.Text = Guid.NewGuid().ToString();
+        }
+
+        private void btnVerDados(object? sender, EventArgs e)
+        {
+            if(form.txtDadoSolicitado.PasswordChar == '*')
+                form.txtDadoSolicitado.PasswordChar = '\0';
+            else
+                form.txtDadoSolicitado.PasswordChar = '*';            
         }
 
         private void Salvar()
@@ -96,6 +127,8 @@ namespace GerarEtiquetas.Controller
         {
             if (Formato == Nucleo.Base.Enumeradores.Prompt.Dado.Assinatura)
                 FormatarAssinatura();
+            else if (Formato == Nucleo.Base.Enumeradores.Prompt.Dado.AssinaturaRepresentante)
+                FormatarAssinaturaRepresentante();
             else if (Formato  == Nucleo.Base.Enumeradores.Prompt.Dado.Servidor_BancoDados)
                 FormatarServidor();
             else if (Formato == Nucleo.Base.Enumeradores.Prompt.Dado.Nome_BancoDados)

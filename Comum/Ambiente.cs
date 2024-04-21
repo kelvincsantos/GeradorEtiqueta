@@ -1,30 +1,60 @@
 ﻿using GerarEtiquetas.Forms.Comum;
 using Microsoft.Win32;
+using Nucleo.Base.Seguranca;
+using Nucleo.Base.SQL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace GerarEtiquetas.Comum
 {
-    public static class Ambiente
+    public class Ambiente
     {
+        public Criptografia Criptografia;
+        public Arquivos Arquivos;
+        public SQL? Banco;
 
+        public Ambiente()
+        {
+            Criptografia = new();
+            Arquivos = new();
+        }
+
+        public static bool ChecarAssinaturaRepresentante(string assinatura = "")
+        {
+            string valor = ChavesSistema.Buscar("config");
+
+            if (string.IsNullOrWhiteSpace(valor))
+            {
+                valor = ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado.AssinaturaRepresentante);
+                ChavesSistema.Registrar("config", valor);
+                return true;
+            }
+
+            if (assinatura != valor)
+                return false;
+
+
+            return true;
+        }
 
         public static bool ChecarAssinatura()
         {
-            string assinatura = Program.arquivos.LerAssinatura();
+            
+            string assinatura = Program.Ambiente.Arquivos.LerAssinatura();
+            string AssinaturaRepresentante = string.Empty;
 
             if (string.IsNullOrEmpty(assinatura))
             {
                 Mensagem.Aviso("Não foi encontrado o arquivo de assinatura do sistema.");
+                assinatura = ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado.Assinatura);
+                AssinaturaRepresentante = ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado.AssinaturaRepresentante);
 
-                Telas.Prompt prompt = new Telas.Prompt(Nucleo.Base.Enumeradores.Prompt.Dado.Assinatura);
-
-                Leiaute.Tela.ExibirPequeno(prompt);
-
-                assinatura = prompt.controller.DadoRetornado;
+                assinatura = string.Concat(assinatura, "|", DateTime.Now.AddYears(1).ToString("dd/MM/yyyy"), "|", AssinaturaRepresentante);
+                Program.Ambiente.Arquivos.GravarAssinatura(assinatura);
             }
 
             if (string.IsNullOrEmpty(assinatura))
@@ -35,20 +65,37 @@ namespace GerarEtiquetas.Comum
 
             try
             {
-                RegistryKey? Registro = Registry.LocalMachine.OpenSubKey("NucleoAsign", true);
+                AssinaturaRepresentante = ChavesSistema.Buscar("config");
 
-                if (Registro == null)
+                string[] dado = assinatura.Split('|');
+                string valor = ChavesSistema.Buscar("Asign");
+
+                if (!ChecarAssinaturaRepresentante(AssinaturaRepresentante))
                 {
-                    Registro = Registry.LocalMachine.CreateSubKey("NucleoAsign", true);
-                    Registro.SetValue("Asign", assinatura);
-                    return true;
+                    Mensagem.Alerta("Assinatura do representante não reconhecida, o sistema será fechado.");
+                    Program.Ambiente.Arquivos.DeletarAssinatura();
+                    return false;
                 }
 
-                string? ValorCapturado = Registro?.GetValue("Asign")?.ToString();
+                if (string.IsNullOrWhiteSpace(valor))
+                {
+                    valor = dado[0];
 
-                if(assinatura != ValorCapturado)
+                    ChavesSistema.Registrar("Asign", valor);
+                    return true;
+                }                
+
+                if (dado[0] != valor)
                 {
                     Mensagem.Alerta("Assinatura não reconhecida, o sistema será fechado.");
+                    return false;
+                }
+
+                DateTime dataVencimento = Convert.ToDateTime(dado[1]);
+
+                if (dataVencimento < DateTime.Now)
+                {
+                    Mensagem.Alerta("Assinatura vencida, o sistema será fechado.");
                     return false;
                 }
             }
@@ -63,7 +110,61 @@ namespace GerarEtiquetas.Comum
 
         public static bool ChecarBanco()
         {
+            string dados = Program.Ambiente.Arquivos.LerBanco();
+            string Servidor = string.Empty;
+            string NomeBanco = string.Empty;
+            string Senha = string.Empty;
+
+
+            if (string.IsNullOrEmpty(dados))
+            {
+                Mensagem.Aviso("Não foi encontrado o arquivo de banco de dados do sistema.");
+
+                Servidor = ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado.Servidor_BancoDados);
+                NomeBanco = ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado.Nome_BancoDados);
+                Senha = ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado.Senha_BancoDados);
+
+                if (string.IsNullOrEmpty(Servidor))
+                {
+                    Mensagem.Alerta("servidor do banco de dados inconsistente, o sistema será fechado.");
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(NomeBanco))
+                {
+                    Mensagem.Alerta("Nome do banco de dados inconsistente, o sistema será fechado.");
+                    return false;
+                }
+
+                if (string.IsNullOrEmpty(Senha))
+                {
+                    Mensagem.Alerta("Senha do banco de dados inconsistente, o sistema será fechado.");
+                    return false;
+                }
+
+                dados = string.Concat(Servidor, "|", NomeBanco, "|", Senha);
+                Program.Ambiente.Arquivos.GravarBanco(dados);
+            }
+
+            try
+            {
+                Program.Ambiente.Banco = new SQL(new SQL.Conexao(dados));
+            }
+            catch (Exception ex)
+            {
+                Mensagem.Erro("Erro ao verificar banco de dados, o sistema será fechado.", ex);
+                return false;
+            }
             return true;
+        }
+
+        private static string ChamarPrompt(Nucleo.Base.Enumeradores.Prompt.Dado dado)
+        {
+            Telas.Prompt prompt = new Telas.Prompt(dado);
+
+            Leiaute.Tela.Exibir(prompt);
+
+            return prompt.controller.DadoRetornado;
         }
     }
 }

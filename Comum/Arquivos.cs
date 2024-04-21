@@ -9,40 +9,42 @@ namespace GerarEtiquetas.Comum
 {
     public class Arquivos
     {
-        public Nucleo.Base.Seguranca.Criptografia Criptografia { get; set; }
         private const string Diretorio = "Config";
 
         private const string Banco = "Caixa.conf";
         private const string Assinatura = "APIS.conf";
 
-        private string dirBanco = Path.Combine(Diretorio, Banco);
-        private string dirAssinatura = Path.Combine(Diretorio, Assinatura);
+        private readonly string dirBanco = Path.Combine(Diretorio, Banco);
+        private readonly string dirAssinatura = Path.Combine(Diretorio, Assinatura);
 
         public Arquivos()
         {
             if (!Directory.Exists(Diretorio))
                 Directory.CreateDirectory(Diretorio);
-
-            Criptografia = new Nucleo.Base.Seguranca.Criptografia();
         }
 
-        public bool GravarBanco(string servidor, string banco, string senha)
+        public bool GravarBanco(string dados)
         {
-            string s = Criptografia.Codificar(string.Concat(servidor, "|", banco, "|", senha));
+            string s = Program.Ambiente.Criptografia.Codificar(dados);
 
             return Gravar(dirBanco, s);
         }
         public string LerBanco()
         {
-            return Criptografia.Decodificar(Ler(dirBanco));
+            return Program.Ambiente.Criptografia.Decodificar(Ler(dirBanco));
         }
-        public bool GravarAssinatura(string senha)
+        public bool GravarAssinatura(string assinatura)
         {
-            return Gravar(dirAssinatura, Criptografia.Codificar(senha));
+            return Gravar(dirAssinatura, Program.Ambiente.Criptografia.Codificar(assinatura));
         }
+        public void DeletarAssinatura()
+        {
+            Deletar(dirAssinatura);
+        }
+
         public string LerAssinatura()
         {
-            return Criptografia.Decodificar(Ler(dirAssinatura));
+            return Program.Ambiente.Criptografia.Decodificar(Ler(dirAssinatura));
         }
 
         private string Ler(string arquivo, bool mensagem = false)
@@ -120,9 +122,8 @@ namespace GerarEtiquetas.Comum
         {
             try
             {
-                if (File.Exists(arquivo))
-                    File.Delete(arquivo);
-
+                Deletar(arquivo);
+                
                 if (conteudo == null)
                     return true;
 
@@ -141,6 +142,12 @@ namespace GerarEtiquetas.Comum
                 Mensagem.Erro(string.Concat("Erro ao ler arquivo: ", arquivo), ex);
                 return false;
             }
+        }
+
+        private void Deletar(string arquivo)
+        {
+            if (File.Exists(arquivo))
+                File.Delete(arquivo);
         }
     }
 }

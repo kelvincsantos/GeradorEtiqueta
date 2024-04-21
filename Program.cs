@@ -8,7 +8,7 @@ namespace GerarEtiquetas
 {
     internal static class Program
     {
-        public static Arquivos arquivos;
+        public static Ambiente Ambiente = new();
 
         /// <summary>
         ///  The main entry point for the application.
@@ -16,16 +16,12 @@ namespace GerarEtiquetas
         [STAThread]
         static void Main()
         {
-            arquivos = new Arquivos();
-
             bool createdNew = true;
 
-            using (Mutex mutex = new Mutex(true, "FrenteCaixaBoxPDV", out createdNew))
+            using (Mutex mutex = new Mutex(true, "GerarEtiquetas", out createdNew))
             {
                 if (createdNew)
                 {
-                    
-
                     ApplicationConfiguration.Initialize();
 
                     ////Application.SetHighDpiMode(HighDpiMode.SystemAware);
@@ -53,6 +49,8 @@ namespace GerarEtiquetas
         {
             try
             {
+                Comum.Ambiente.ChecarAssinaturaRepresentante();
+
                 if (!Comum.Ambiente.ChecarAssinatura())
                     Program.Exit();
 
