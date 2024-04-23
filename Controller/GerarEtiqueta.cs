@@ -57,7 +57,7 @@ namespace GerarEtiquetas.Forms.Controller
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
         {
-            Adicionar();
+            Salvar();
         }
 
         private void btnImportar_Click(object? sender, EventArgs e)
@@ -103,6 +103,13 @@ namespace GerarEtiquetas.Forms.Controller
 
         private void CarregarDetalhes(Etiqueta e)
         {
+            if (e == null)
+            {
+                Limpar();
+                return;
+            }
+                
+
             form.txtDataCalibracao.Text = e.DataCalibracao.GetValueOrDefault().ToShortDateString();
             form.txtProximaCalibracao.Text = e.ProximaCalibracao.GetValueOrDefault().ToShortDateString();
 
@@ -116,6 +123,7 @@ namespace GerarEtiquetas.Forms.Controller
 
         private void Mostrar()
         {
+            form.dgvEtiquetas.DataSource = null;
             //CARREGAR UM GRID NA TELA COM AS ETIQUETAS JÁ ADICIONADAS NA LISTA
 
 
@@ -134,9 +142,10 @@ namespace GerarEtiquetas.Forms.Controller
             Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Identificação", Referencia = "NumeroCertificado", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
             Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Laudo", Referencia = "DiretorioLaudo", Tamanho = 500, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
 
-        Telas.Controls.Grid.Init(form.dgvEtiquetas, Columns);
+            Telas.Controls.Grid.Init(form.dgvEtiquetas, Columns);
 
             form.dgvEtiquetas.DataSource = etiquetas;
+                
             form.dgvEtiquetas.Focus();
         }
 
@@ -297,6 +306,30 @@ namespace GerarEtiquetas.Forms.Controller
                 retorno = form.ArquivoExterno.FileName;
 
             return retorno;
+        }
+
+        private void Salvar()
+        {
+            try
+            {
+                if(etiquetas.Count() <= 0)
+                {
+                    Mensagem.Alerta("Ñão foram encontradas etiquetas para impressão");
+                    return;
+                }
+
+                foreach (Etiqueta item in etiquetas)
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Mensagem.Erro("Erro ao salvar etiquetas para a fila de impressão", ex);
+                throw;
+            }
+            
+
         }
     }
 }
