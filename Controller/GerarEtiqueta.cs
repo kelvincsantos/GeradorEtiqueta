@@ -22,6 +22,8 @@ namespace GerarEtiquetas.Forms.Controller
         {
             this.form = e;
 
+            form.Load += Form_Load;
+
             form.btnVisualizarQRCode.Click += btnVisualizarQRCode_Click;
             form.btnEnviarEtiquetas.Click += btnEnviarEtiquetas_Click;
 
@@ -30,6 +32,7 @@ namespace GerarEtiquetas.Forms.Controller
 
             form.btnSalvar.Click += BtnSalvar_Click;
             form.btnExcluir.Click += BtnExcluir_Click;
+
 
             form.txtDataCalibracao.KeyPress += Leiaute.TextBox.KeyPress_Data;
             form.txtDataCalibracao.LostFocus += Leiaute.TextBox.LostFocus_Data;
@@ -45,6 +48,11 @@ namespace GerarEtiquetas.Forms.Controller
             etiquetas = new List<Etiqueta>();
         }
 
+        private void Form_Load(object? sender, EventArgs e)
+        {
+            CarregarEtiquetasPendentes();
+        }
+
         private void BtnExcluir_Click(object? sender, EventArgs e)
         {
             Excluir();
@@ -57,7 +65,7 @@ namespace GerarEtiquetas.Forms.Controller
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
         {
-            Salvar();
+            Adicionar();
         }
 
         private void btnImportar_Click(object? sender, EventArgs e)
@@ -77,6 +85,7 @@ namespace GerarEtiquetas.Forms.Controller
 
         private void btnEnviarEtiquetas_Click(object? sender, EventArgs e)
         {
+            Salvar();
             Limpar();
         }
 
@@ -108,7 +117,7 @@ namespace GerarEtiquetas.Forms.Controller
                 Limpar();
                 return;
             }
-                
+
 
             form.txtDataCalibracao.Text = e.DataCalibracao.GetValueOrDefault().ToShortDateString();
             form.txtProximaCalibracao.Text = e.ProximaCalibracao.GetValueOrDefault().ToShortDateString();
@@ -119,6 +128,18 @@ namespace GerarEtiquetas.Forms.Controller
 
             form.pbPreVisualizacao.Image = Nucleo.Operacoes.Aplicacao.CodigoBarras.GenerateQRCode(form.txtDiretorioLaudo.Text);
             Editando = e;
+        }
+
+        private void CarregarEtiquetasPendentes()
+        {
+            etiquetas = new List<Etiqueta>();
+
+            Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
+
+            etiquetas = BO.BuscarPendentesDeImpressao();
+
+            Mostrar();
+            form.txtDiretorioLaudo.Focus();
         }
 
         private void Mostrar()
@@ -136,16 +157,16 @@ namespace GerarEtiquetas.Forms.Controller
 
             List<Telas.Controls.Grid.Column> Columns = new List<Telas.Controls.Grid.Column>();
 
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Data Calibração", Referencia = "DataCalibracao", Tamanho = 80 });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Próx. Calibração", Referencia = "ProximaCalibracao", Tamanho = 80 });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Data Calibração", Referencia = "DataCalibracao", Tamanho = 84 });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Próx. Calibração", Referencia = "ProximaCalibracao", Tamanho = 84 });
             Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Certificado", Referencia = "NumeroCertificado", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Identificação", Referencia = "NumeroCertificado", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
-            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Laudo", Referencia = "DiretorioLaudo", Tamanho = 500, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Identificação", Referencia = "NumeroIdentificacao", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Laudo", Referencia = "DiretorioLaudo", Tamanho = 484, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
 
             Telas.Controls.Grid.Init(form.dgvEtiquetas, Columns);
 
             form.dgvEtiquetas.DataSource = etiquetas;
-                
+
             form.dgvEtiquetas.Focus();
         }
 
@@ -181,12 +202,7 @@ namespace GerarEtiquetas.Forms.Controller
                 return;
             }
 
-            if (etiquetas == null)
-                etiquetas = new List<Etiqueta>();
-
-            if (Editando != null)
-                etiquetas.Remove(Editando);
-            else
+            if (Editando == null)
                 Editando = new Etiqueta() { ID = Guid.NewGuid().ToString() };
 
 
@@ -196,10 +212,12 @@ namespace GerarEtiquetas.Forms.Controller
             Editando.NumeroIdentificacao = form.txtNumeroIdentificacao.Text.Trim();
             Editando.ProximaCalibracao = Convert.ToDateTime(form.txtProximaCalibracao.Text.Trim());
 
-            etiquetas.Add(Editando);
+            Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
+            if (BO.InserirOuAlterar(Editando))
+                Mensagem.Sucesso("Etiqueta cadastrada com sucesso.");
 
             Limpar();
-            Mostrar();
+            CarregarEtiquetasPendentes();
         }
 
         private void Excluir()
@@ -210,10 +228,13 @@ namespace GerarEtiquetas.Forms.Controller
             if (etiquetas == null)
                 return;
 
-            etiquetas.Remove(Editando);
+
+            Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
+            if (BO.Deletar(Editando))
+                Mensagem.Sucesso("Etiqueta excluída com sucesso.");
 
             Limpar();
-            Mostrar();
+            CarregarEtiquetasPendentes();
         }
 
         private void Visualizar()
@@ -250,7 +271,7 @@ namespace GerarEtiquetas.Forms.Controller
         private void CarregarLista()
         {
             Importar();
-            Mostrar();
+            CarregarEtiquetasPendentes();
         }
 
         private void Importar()
@@ -263,7 +284,7 @@ namespace GerarEtiquetas.Forms.Controller
             XLWorkbook xls = new XLWorkbook(arquivo);
             IXLWorksheet? plan1 = xls.Worksheets.FirstOrDefault();
 
-            if(plan1 == null)
+            if (plan1 == null)
             {
                 Mensagem.Alerta("Nenhum registro encontrado no arquivo.");
                 return;
@@ -275,6 +296,7 @@ namespace GerarEtiquetas.Forms.Controller
                 return;
             }
 
+            Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
             foreach (IXLRows row in plan1.Rows())
             {
                 Etiqueta item = new Etiqueta();
@@ -286,6 +308,13 @@ namespace GerarEtiquetas.Forms.Controller
                 //item.DiretorioLaudo = row.Cell().Value.ToString();
 
                 //plan1.Cell(String.Format("U{0}", i)).Value.ToString;
+
+                if (!BO.InserirOuAlterar(item))
+                {
+                    Mensagem.Erro("Erro ao inserir etiqueta por importação.");
+                    return;
+                }
+                    
             }
         }
 
@@ -312,15 +341,20 @@ namespace GerarEtiquetas.Forms.Controller
         {
             try
             {
-                if(etiquetas.Count() <= 0)
+                if (etiquetas.Count() <= 0)
                 {
                     Mensagem.Alerta("Ñão foram encontradas etiquetas para impressão");
                     return;
                 }
 
+                Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
                 foreach (Etiqueta item in etiquetas)
                 {
-
+                    if (BO.InserirOuAlterar(item))
+                    {
+                        Mensagem.Sucesso("Etiqueta inserida com sucesso.");
+                        BO.GerarFilaImpressao(item);
+                    }
                 }
             }
             catch (Exception ex)
@@ -328,7 +362,7 @@ namespace GerarEtiquetas.Forms.Controller
                 Mensagem.Erro("Erro ao salvar etiquetas para a fila de impressão", ex);
                 throw;
             }
-            
+
 
         }
     }

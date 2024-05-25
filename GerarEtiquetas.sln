@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleo.Data", "..\Projeto_N
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleo.Operacoes", "..\Projeto_Nucleo\Nucleo.Operacoes\Nucleo.Operacoes.csproj", "{E3CC37E0-6012-4887-9EE0-AF8C674FA3C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnviarEtiquetasImpressora", "..\EnviarEtiquetasImpressora\EnviarEtiquetasImpressora.csproj", "{99F72ACD-A737-4A99-9EE9-76ACCA23AE79}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EnviarEtiquetasImpressora", "..\ServicoEnviarEtiquetas\EnviarEtiquetasImpressora\EnviarEtiquetasImpressora.csproj", "{99F72ACD-A737-4A99-9EE9-76ACCA23AE79}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nucleo.Base", "..\Projeto_Nucleo\Base\Nucleo.Base.csproj", "{F121F3AA-13AA-448F-A942-12864D60A0C5}"
 EndProject
