@@ -33,6 +33,7 @@ namespace GerarEtiquetas.Forms.Controller
             form.btnSalvar.Click += BtnSalvar_Click;
             form.btnExcluir.Click += BtnExcluir_Click;
 
+            form.btnConfiguracoes.Click += BtnConfiguracoes_Click;
 
             form.txtDataCalibracao.KeyPress += Leiaute.TextBox.KeyPress_Data;
             form.txtDataCalibracao.LostFocus += Leiaute.TextBox.LostFocus_Data;
@@ -46,6 +47,11 @@ namespace GerarEtiquetas.Forms.Controller
             form.dgvEtiquetas.DoubleClick += dgvEtiquetas_DoubleClick;
 
             etiquetas = new List<Etiqueta>();
+        }
+
+        private void BtnConfiguracoes_Click(object? sender, EventArgs e)
+        {
+            Configuracoes();
         }
 
         private void Form_Load(object? sender, EventArgs e)
@@ -364,6 +370,13 @@ namespace GerarEtiquetas.Forms.Controller
             }
 
 
+        }
+
+        private void Configuracoes()
+        {
+            Forms.Telas.Configuracoes frm = new Telas.Configuracoes();
+
+            Leiaute.Tela.Exibir(frm);
         }
     }
 }

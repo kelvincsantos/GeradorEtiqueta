@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using Nucleo.Base.Seguranca;
 using Nucleo.Base.SQL;
+using Nucleo.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,12 @@ namespace GerarEtiquetas.Comum
         public Criptografia Criptografia;
         public Arquivos Arquivos;
         public SQL? Banco;
-
+        public Configuracao Configuracao;
         public Ambiente()
         {
             Criptografia = new();
             Arquivos = new();
+            Configuracao = Ambiente.Configurar();
         }
 
         public static bool ChecarAssinaturaRepresentante(string assinatura = "")
@@ -165,6 +167,11 @@ namespace GerarEtiquetas.Comum
             Leiaute.Tela.Exibir(prompt);
 
             return prompt.controller.DadoRetornado;
+        }
+
+        private static Configuracao Configurar()
+        {
+            return new Nucleo.Operacoes.BO.Configuracao().BuscarConfiguracao();
         }
     }
 }
