@@ -57,7 +57,7 @@ namespace GerarEtiquetas
                 if(!Comum.Ambiente.ChecarBanco())
                     Program.Exit();
 
-
+                Ambiente.Configuracao = Comum.Ambiente.Configurar();
 
                 Application.Run(new GerarEtiquetas.Forms.Telas.GerarEtiqueta());
             }

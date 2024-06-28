@@ -265,6 +265,8 @@ namespace GerarEtiquetas.Forms.Controller
 
                 sw.Close();
 
+                Mensagem.Sucesso(string.Concat("Arquivo gerado com sucesso em:", Arquivo));
+
                 return Arquivo;
             }
             catch (Exception)
@@ -303,15 +305,29 @@ namespace GerarEtiquetas.Forms.Controller
             }
 
             Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
-            foreach (IXLRows row in plan1.Rows())
+            List<IXLRow> lista = plan1.Rows().ToList();
+            lista.RemoveAt(0);
+            foreach (IXLRow row in lista)
             {
                 Etiqueta item = new Etiqueta();
 
+                item.NumeroIdentificacao = row.Cell(1).Value.ToString();
+                item.NumeroCertificado = row.Cell(2).Value.ToString();
+
+                DateTime valor;
+                if (DateTime.TryParse(row.Cell(3).Value.ToString(), out valor))
+                    item.DataCalibracao = valor;
+
+                if(DateTime.TryParse(row.Cell(4).Value.ToString(), out valor))
+                    item.ProximaCalibracao = valor;
+
+                item.DiretorioLaudo = row.Cell(5).Value.ToString();
                 //item.DataCalibracao = row.Cell().Value.ToString();
-                //item.ProximaCalibracao = row.Cell().Value.ToString();
-                //item.NumeroCertificado = row.Cell().Value.ToString();
-                //item.NumeroIdentificacao = row.Cell().Value.ToString();
-                //item.DiretorioLaudo = row.Cell().Value.ToString();
+
+
+                
+
+
 
                 //plan1.Cell(String.Format("U{0}", i)).Value.ToString;
 
@@ -356,6 +372,20 @@ namespace GerarEtiquetas.Forms.Controller
                 Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
                 foreach (Etiqueta item in etiquetas)
                 {
+                    if (!Directory.Exists("Arquivos_PDF"))
+                        Directory.CreateDirectory("Arquivos_PDF");
+
+                    string NomeArquivo = string.Concat("Laudo_", item.NumeroIdentificacao, "_", item.NumeroCertificado, ".pdf");
+                    string arquivoLaudo = Path.Combine("Arquivos_PDF", NomeArquivo);
+
+                    Arquivos.CriarArquivoPDFVazio(arquivoLaudo);
+
+                    string link  = API.GoogleDrive.EnviarArquivo(arquivoLaudo);
+
+                    
+                    item.DiretorioLaudo = link;
+
+
                     if (BO.InserirOuAlterar(item))
                     {
                         Mensagem.Sucesso("Etiqueta inserida com sucesso.");

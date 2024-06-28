@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using PDF = ceTe.DynamicPDF;
+using PDF_Page = ceTe.DynamicPDF.PageElements;
 using System.Threading.Tasks;
+using IO = System.IO;
 
 namespace GerarEtiquetas.Comum
 {
@@ -148,6 +151,20 @@ namespace GerarEtiquetas.Comum
         {
             if (File.Exists(arquivo))
                 File.Delete(arquivo);
+        }
+
+        public static void CriarArquivoPDFVazio(string nomeArquivo)
+        {
+            PDF.Document document = new PDF.Document();
+
+            PDF.Page page = new PDF.Page(PDF.PageSize.Letter, PDF.PageOrientation.Portrait, 54.0f);
+            document.Pages.Add(page);
+
+            string labelText = "Laudo em processo de geração...";
+            PDF_Page.Label label = new PDF_Page.Label(labelText, 0, 0, 504, 100, PDF.Font.Helvetica, 18, PDF.TextAlign.Center);
+            page.Elements.Add(label);
+
+            document.Draw(nomeArquivo);
         }
     }
 }

@@ -17,12 +17,11 @@ namespace GerarEtiquetas.Comum
         public Criptografia Criptografia;
         public Arquivos Arquivos;
         public SQL? Banco;
-        public Configuracao Configuracao;
+        public Configuracao? Configuracao;
         public Ambiente()
         {
             Criptografia = new();
             Arquivos = new();
-            Configuracao = Ambiente.Configurar();
         }
 
         public static bool ChecarAssinaturaRepresentante(string assinatura = "")
@@ -169,9 +168,9 @@ namespace GerarEtiquetas.Comum
             return prompt.controller.DadoRetornado;
         }
 
-        private static Configuracao Configurar()
+        public static Configuracao Configurar()
         {
-            return new Nucleo.Operacoes.BO.Configuracao().BuscarConfiguracao();
+            return new Nucleo.Operacoes.BO.Configuracao(Program.Ambiente.Banco).BuscarConfiguracao();
         }
     }
 }

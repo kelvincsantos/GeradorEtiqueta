@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ceTe.DynamicPDF.CoreSuite.NET" Version="12.17.0" />
     <PackageReference Include="ClosedXML" Version="0.102.2" />
+    <PackageReference Include="Google.Apis.Drive.v3" Version="1.68.0.3428" />
     <PackageReference Include="QRCoder" Version="1.5.1" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.5" />
     <PackageReference Include="System.Management" Version="8.0.0" />
