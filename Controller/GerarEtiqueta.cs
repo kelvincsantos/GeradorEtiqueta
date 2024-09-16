@@ -17,6 +17,7 @@ namespace GerarEtiquetas.Forms.Controller
 
         private List<Etiqueta> etiquetas;
         private Etiqueta? Editando;
+        private OrdemServico? OrdemServico;
 
         public GerarEtiqueta(Forms.Telas.GerarEtiqueta e)
         {
@@ -26,6 +27,8 @@ namespace GerarEtiquetas.Forms.Controller
 
             form.btnVisualizarQRCode.Click += btnVisualizarQRCode_Click;
             form.btnEnviarEtiquetas.Click += btnEnviarEtiquetas_Click;
+            form.btnCarregar.Click += BtnCarregar_Click;
+            form.btnLimpar.Click += BtnLimpar_Click;
 
             form.btnImportar.Click += btnImportar_Click;
             form.btnPlanilhaPadrao.Click += btnPlanilhaPadrao_Click;
@@ -47,6 +50,17 @@ namespace GerarEtiquetas.Forms.Controller
             form.dgvEtiquetas.DoubleClick += dgvEtiquetas_DoubleClick;
 
             etiquetas = new List<Etiqueta>();
+            OrdemServico = null;
+        }
+
+        private void BtnLimpar_Click(object? sender, EventArgs e)
+        {
+            LimparTudo();
+        }
+
+        private void BtnCarregar_Click(object? sender, EventArgs e)
+        {
+            CarregarOS();
         }
 
         private void BtnConfiguracoes_Click(object? sender, EventArgs e)
@@ -92,17 +106,33 @@ namespace GerarEtiquetas.Forms.Controller
         private void btnEnviarEtiquetas_Click(object? sender, EventArgs e)
         {
             Salvar();
+            LimparTudo();
+        }
+
+        private void LimparTudo()
+        {
+            LimparOS();
             Limpar();
+        }
+
+        private void LimparOS()
+        {
+            form.txtOrdemServico.Text = string.Empty;
+            form.gbDadosNovo.Enabled = false;
         }
 
         private void Limpar()
         {
+            
             form.txtDataCalibracao.Text = string.Empty;
             form.txtDiretorioLaudo.Text = string.Empty;
             form.txtNroCertificacao.Text = string.Empty;
             form.txtNumeroIdentificacao.Text = string.Empty;
             form.txtProximaCalibracao.Text = string.Empty;
             form.pbPreVisualizacao.Image = null;
+
+            form.dgvEtiquetas.DataSource = null;
+
             Editando = null;
         }
 
@@ -124,6 +154,7 @@ namespace GerarEtiquetas.Forms.Controller
                 return;
             }
 
+            form.gbDadosNovo.Enabled = true;
 
             form.txtDataCalibracao.Text = e.DataCalibracao.GetValueOrDefault().ToShortDateString();
             form.txtProximaCalibracao.Text = e.ProximaCalibracao.GetValueOrDefault().ToShortDateString();
@@ -163,6 +194,7 @@ namespace GerarEtiquetas.Forms.Controller
 
             List<Telas.Controls.Grid.Column> Columns = new List<Telas.Controls.Grid.Column>();
 
+            Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Ordem Serviço", Referencia = "OrdemServico", Tamanho = 84 });
             Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Data Calibração", Referencia = "DataCalibracao", Tamanho = 84 });
             Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Próx. Calibração", Referencia = "ProximaCalibracao", Tamanho = 84 });
             Columns.Add(new Telas.Controls.Grid.Column() { Titulo = "Nro. Certificado", Referencia = "NumeroCertificado", Tamanho = 120, Alinhamento = DataGridViewContentAlignment.MiddleLeft });
@@ -202,11 +234,11 @@ namespace GerarEtiquetas.Forms.Controller
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(form.txtDiretorioLaudo.Text))
-            {
-                Mensagem.Alerta("Campo diretório do Laudo obrigatório para gerar etiqueta.");
-                return;
-            }
+            //if (string.IsNullOrWhiteSpace(form.txtDiretorioLaudo.Text))
+            //{
+            //    Mensagem.Alerta("Campo diretório do Laudo obrigatório para gerar etiqueta.");
+            //    return;
+            //}
 
             if (Editando == null)
                 Editando = new Etiqueta() { ID = Guid.NewGuid().ToString() };
@@ -217,13 +249,14 @@ namespace GerarEtiquetas.Forms.Controller
             Editando.NumeroCertificado = form.txtNroCertificacao.Text.Trim();
             Editando.NumeroIdentificacao = form.txtNumeroIdentificacao.Text.Trim();
             Editando.ProximaCalibracao = Convert.ToDateTime(form.txtProximaCalibracao.Text.Trim());
+            Editando.CodigoOrdemServico = OrdemServico?.ID;
 
             Nucleo.Operacoes.BO.Etiquetas BO = new Nucleo.Operacoes.BO.Etiquetas(Program.Ambiente.Banco);
             if (BO.InserirOuAlterar(Editando))
                 Mensagem.Sucesso("Etiqueta cadastrada com sucesso.");
 
             Limpar();
-            CarregarEtiquetasPendentes();
+            CarregarEtiquetasDaOS();
         }
 
         private void Excluir()
@@ -260,8 +293,8 @@ namespace GerarEtiquetas.Forms.Controller
 
                 StreamWriter sw = new StreamWriter(Arquivo, false);
 
-                sw.WriteLine("NumeroIdentificacao;NumeroCertificado;DataCalibracao;ProximaCalibracao;DiretorioLaudo;");
-                sw.WriteLine("                   ;                 ;              ;                 ;              ;");
+                sw.WriteLine("OrdemServico;NumeroIdentificacao;NumeroCertificado;DataCalibracao;ProximaCalibracao;DiretorioLaudo;");
+                sw.WriteLine("            ;                   ;                 ;              ;                 ;              ;");
 
                 sw.Close();
 
@@ -311,21 +344,22 @@ namespace GerarEtiquetas.Forms.Controller
             {
                 Etiqueta item = new Etiqueta();
 
-                item.NumeroIdentificacao = row.Cell(1).Value.ToString();
-                item.NumeroCertificado = row.Cell(2).Value.ToString();
+                item.OrdemServico = row.Cell(1).Value.ToString();
+                item.NumeroIdentificacao = row.Cell(2).Value.ToString();
+                item.NumeroCertificado = row.Cell(3).Value.ToString();
 
                 DateTime valor;
-                if (DateTime.TryParse(row.Cell(3).Value.ToString(), out valor))
+                if (DateTime.TryParse(row.Cell(4).Value.ToString(), out valor))
                     item.DataCalibracao = valor;
 
-                if(DateTime.TryParse(row.Cell(4).Value.ToString(), out valor))
+                if (DateTime.TryParse(row.Cell(5).Value.ToString(), out valor))
                     item.ProximaCalibracao = valor;
 
-                item.DiretorioLaudo = row.Cell(5).Value.ToString();
+                item.DiretorioLaudo = row.Cell(6).Value.ToString();
                 //item.DataCalibracao = row.Cell().Value.ToString();
 
 
-                
+
 
 
 
@@ -336,7 +370,7 @@ namespace GerarEtiquetas.Forms.Controller
                     Mensagem.Erro("Erro ao inserir etiqueta por importação.");
                     return;
                 }
-                    
+
             }
         }
 
@@ -380,9 +414,12 @@ namespace GerarEtiquetas.Forms.Controller
 
                     Arquivos.CriarArquivoPDFVazio(arquivoLaudo);
 
-                    string link  = API.GoogleDrive.EnviarArquivo(arquivoLaudo);
+                    //API.OneDrive.Login().Wait();
+                    //API.OneDrive.Token("");
 
-                    
+                    string link = API.GoogleDrive.EnviarArquivo(arquivoLaudo);
+
+
                     item.DiretorioLaudo = link;
 
 
@@ -407,6 +444,49 @@ namespace GerarEtiquetas.Forms.Controller
             Forms.Telas.Configuracoes frm = new Telas.Configuracoes();
 
             Leiaute.Tela.Exibir(frm);
+        }
+
+        private void CarregarOS()
+        {
+            if (string.IsNullOrWhiteSpace(form.txtOrdemServico.Text))
+            {
+                Mensagem.Alerta("Preencher o campo OS.");
+                form.txtOrdemServico.Focus();
+                return;
+            }
+
+            form.gbDadosNovo.Enabled = true;
+            form.gbImportacao.Enabled = true;
+
+            Nucleo.Operacoes.BO.OrdemServico BO = new Nucleo.Operacoes.BO.OrdemServico(Program.Ambiente.Banco);
+
+            if (BO.ExisteOS(form.txtOrdemServico.Text.Trim()))
+                OrdemServico = BO.BuscarOS(form.txtOrdemServico.Text.Trim());
+            else
+            {
+                OrdemServico = new OrdemServico()
+                {
+                    ID = Guid.NewGuid().ToString(),
+                    Criacao = DateTime.Now,
+                    OS = form.txtOrdemServico.Text.Trim(),
+                };
+
+                BO.InserirOuAlterar(OrdemServico);
+            }
+
+            CarregarEtiquetasDaOS();
+        }
+
+        private void CarregarEtiquetasDaOS()
+        {
+            etiquetas = new List<Etiqueta>();
+
+            Nucleo.Operacoes.BO.OrdemServico BO = new Nucleo.Operacoes.BO.OrdemServico(Program.Ambiente.Banco);
+
+            etiquetas = BO.BuscarEtiquetas(OrdemServico);
+
+
+            Mostrar();
         }
     }
 }

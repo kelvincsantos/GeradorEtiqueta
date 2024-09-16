@@ -31,10 +31,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GerarEtiqueta));
             tcClientes = new TabControl();
             tpPesquisar = new TabPage();
+            lblOrdemServico = new Label();
+            txtOrdemServico = new TextBox();
+            btnCarregar = new Button();
             gbImportacao = new GroupBox();
             btnPlanilhaPadrao = new Button();
             btnImportar = new Button();
             pnBotoes = new Panel();
+            btnLimpar = new Button();
             btnConfiguracoes = new Button();
             btnEnviarEtiquetas = new Button();
             dgvEtiquetas = new DataGridView();
@@ -78,6 +82,9 @@
             // tpPesquisar
             // 
             tpPesquisar.BackColor = SystemColors.Control;
+            tpPesquisar.Controls.Add(lblOrdemServico);
+            tpPesquisar.Controls.Add(txtOrdemServico);
+            tpPesquisar.Controls.Add(btnCarregar);
             tpPesquisar.Controls.Add(gbImportacao);
             tpPesquisar.Controls.Add(pnBotoes);
             tpPesquisar.Controls.Add(dgvEtiquetas);
@@ -90,11 +97,40 @@
             tpPesquisar.TabIndex = 0;
             tpPesquisar.Text = "Pesquisa";
             // 
+            // lblOrdemServico
+            // 
+            lblOrdemServico.AutoSize = true;
+            lblOrdemServico.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            lblOrdemServico.Location = new Point(303, 14);
+            lblOrdemServico.Name = "lblOrdemServico";
+            lblOrdemServico.Size = new Size(42, 25);
+            lblOrdemServico.TabIndex = 11;
+            lblOrdemServico.Text = "OS:";
+            // 
+            // txtOrdemServico
+            // 
+            txtOrdemServico.Font = new Font("Segoe UI", 11F);
+            txtOrdemServico.Location = new Point(351, 11);
+            txtOrdemServico.Margin = new Padding(3, 4, 3, 4);
+            txtOrdemServico.Name = "txtOrdemServico";
+            txtOrdemServico.Size = new Size(147, 32);
+            txtOrdemServico.TabIndex = 5;
+            // 
+            // btnCarregar
+            // 
+            btnCarregar.Location = new Point(504, 11);
+            btnCarregar.Margin = new Padding(3, 4, 3, 4);
+            btnCarregar.Name = "btnCarregar";
+            btnCarregar.Size = new Size(86, 32);
+            btnCarregar.TabIndex = 4;
+            btnCarregar.Text = "Carregar";
+            btnCarregar.UseVisualStyleBackColor = true;
+            // 
             // gbImportacao
             // 
             gbImportacao.Controls.Add(btnPlanilhaPadrao);
             gbImportacao.Controls.Add(btnImportar);
-            gbImportacao.Location = new Point(739, 8);
+            gbImportacao.Location = new Point(739, 48);
             gbImportacao.Margin = new Padding(3, 4, 3, 4);
             gbImportacao.Name = "gbImportacao";
             gbImportacao.Padding = new Padding(3, 4, 3, 4);
@@ -126,6 +162,7 @@
             // pnBotoes
             // 
             pnBotoes.BackColor = SystemColors.ButtonShadow;
+            pnBotoes.Controls.Add(btnLimpar);
             pnBotoes.Controls.Add(btnConfiguracoes);
             pnBotoes.Controls.Add(btnEnviarEtiquetas);
             pnBotoes.Dock = DockStyle.Bottom;
@@ -134,6 +171,16 @@
             pnBotoes.Name = "pnBotoes";
             pnBotoes.Size = new Size(886, 63);
             pnBotoes.TabIndex = 3;
+            // 
+            // btnLimpar
+            // 
+            btnLimpar.Location = new Point(336, 4);
+            btnLimpar.Margin = new Padding(3, 4, 3, 4);
+            btnLimpar.Name = "btnLimpar";
+            btnLimpar.Size = new Size(104, 54);
+            btnLimpar.TabIndex = 17;
+            btnLimpar.Text = "Limpar";
+            btnLimpar.UseVisualStyleBackColor = true;
             // 
             // btnConfiguracoes
             // 
@@ -147,7 +194,7 @@
             // 
             // btnEnviarEtiquetas
             // 
-            btnEnviarEtiquetas.Location = new Point(391, 4);
+            btnEnviarEtiquetas.Location = new Point(446, 4);
             btnEnviarEtiquetas.Margin = new Padding(3, 4, 3, 4);
             btnEnviarEtiquetas.Name = "btnEnviarEtiquetas";
             btnEnviarEtiquetas.Size = new Size(104, 54);
@@ -160,11 +207,11 @@
             dgvEtiquetas.BackgroundColor = SystemColors.Control;
             dgvEtiquetas.BorderStyle = BorderStyle.None;
             dgvEtiquetas.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvEtiquetas.Location = new Point(9, 208);
+            dgvEtiquetas.Location = new Point(9, 248);
             dgvEtiquetas.Margin = new Padding(3, 4, 3, 4);
             dgvEtiquetas.Name = "dgvEtiquetas";
             dgvEtiquetas.RowHeadersWidth = 51;
-            dgvEtiquetas.Size = new Size(871, 280);
+            dgvEtiquetas.Size = new Size(871, 240);
             dgvEtiquetas.TabIndex = 2;
             // 
             // gbDadosNovo
@@ -184,7 +231,8 @@
             gbDadosNovo.Controls.Add(lblNroIdentificacao);
             gbDadosNovo.Controls.Add(lblNumeroCertificacao);
             gbDadosNovo.Controls.Add(btnVisualizarQRCode);
-            gbDadosNovo.Location = new Point(9, 8);
+            gbDadosNovo.Enabled = false;
+            gbDadosNovo.Location = new Point(9, 48);
             gbDadosNovo.Margin = new Padding(3, 4, 3, 4);
             gbDadosNovo.Name = "gbDadosNovo";
             gbDadosNovo.Padding = new Padding(3, 4, 3, 4);
@@ -219,7 +267,7 @@
             txtDataCalibracao.Margin = new Padding(3, 4, 3, 4);
             txtDataCalibracao.MaxLength = 10;
             txtDataCalibracao.Name = "txtDataCalibracao";
-            txtDataCalibracao.Size = new Size(102, 27);
+            txtDataCalibracao.Size = new Size(120, 27);
             txtDataCalibracao.TabIndex = 2;
             txtDataCalibracao.TextAlign = HorizontalAlignment.Center;
             // 
@@ -252,26 +300,26 @@
             // 
             // txtNroCertificacao
             // 
-            txtNroCertificacao.Location = new Point(225, 112);
+            txtNroCertificacao.Location = new Point(255, 112);
             txtNroCertificacao.Margin = new Padding(3, 4, 3, 4);
             txtNroCertificacao.Name = "txtNroCertificacao";
-            txtNroCertificacao.Size = new Size(156, 27);
+            txtNroCertificacao.Size = new Size(147, 27);
             txtNroCertificacao.TabIndex = 4;
             // 
             // txtProximaCalibracao
             // 
-            txtProximaCalibracao.Location = new Point(117, 112);
+            txtProximaCalibracao.Location = new Point(133, 112);
             txtProximaCalibracao.Margin = new Padding(3, 4, 3, 4);
             txtProximaCalibracao.MaxLength = 10;
             txtProximaCalibracao.Name = "txtProximaCalibracao";
-            txtProximaCalibracao.Size = new Size(101, 27);
+            txtProximaCalibracao.Size = new Size(116, 27);
             txtProximaCalibracao.TabIndex = 3;
             txtProximaCalibracao.TextAlign = HorizontalAlignment.Center;
             // 
             // lblProximaCalibracao
             // 
             lblProximaCalibracao.AutoSize = true;
-            lblProximaCalibracao.Location = new Point(117, 88);
+            lblProximaCalibracao.Location = new Point(133, 88);
             lblProximaCalibracao.Name = "lblProximaCalibracao";
             lblProximaCalibracao.Size = new Size(116, 20);
             lblProximaCalibracao.TabIndex = 8;
@@ -296,16 +344,16 @@
             // 
             // txtNumeroIdentificacao
             // 
-            txtNumeroIdentificacao.Location = new Point(389, 112);
+            txtNumeroIdentificacao.Location = new Point(408, 112);
             txtNumeroIdentificacao.Margin = new Padding(3, 4, 3, 4);
             txtNumeroIdentificacao.Name = "txtNumeroIdentificacao";
-            txtNumeroIdentificacao.Size = new Size(154, 27);
+            txtNumeroIdentificacao.Size = new Size(135, 27);
             txtNumeroIdentificacao.TabIndex = 5;
             // 
             // lblNroIdentificacao
             // 
             lblNroIdentificacao.AutoSize = true;
-            lblNroIdentificacao.Location = new Point(389, 88);
+            lblNroIdentificacao.Location = new Point(408, 88);
             lblNroIdentificacao.Name = "lblNroIdentificacao";
             lblNroIdentificacao.Size = new Size(124, 20);
             lblNroIdentificacao.TabIndex = 6;
@@ -314,7 +362,7 @@
             // lblNumeroCertificacao
             // 
             lblNumeroCertificacao.AutoSize = true;
-            lblNumeroCertificacao.Location = new Point(225, 88);
+            lblNumeroCertificacao.Location = new Point(255, 88);
             lblNumeroCertificacao.Name = "lblNumeroCertificacao";
             lblNumeroCertificacao.Size = new Size(117, 20);
             lblNumeroCertificacao.TabIndex = 4;
@@ -346,6 +394,7 @@
             Text = "Gerar Etiquetas";
             tcClientes.ResumeLayout(false);
             tpPesquisar.ResumeLayout(false);
+            tpPesquisar.PerformLayout();
             gbImportacao.ResumeLayout(false);
             pnBotoes.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dgvEtiquetas).EndInit();
@@ -371,16 +420,20 @@
         private System.Windows.Forms.Label lblDiretorioLaudo;
         private System.Windows.Forms.Label lblPreVisualizacao;
         internal System.Windows.Forms.PictureBox pbPreVisualizacao;
-        private GroupBox gbDadosNovo;
         private Panel pnBotoes;
         internal DataGridView dgvEtiquetas;
         internal TabControl tcClientes;
         internal Button btnExcluir;
         internal Button btnSalvar;
-        private GroupBox gbImportacao;
         internal Button btnPlanilhaPadrao;
         internal Button btnImportar;
         internal OpenFileDialog ArquivoExterno;
         internal Button btnConfiguracoes;
+        internal Button btnLimpar;
+        private Label lblOrdemServico;
+        internal TextBox txtOrdemServico;
+        internal Button btnCarregar;
+        internal GroupBox gbDadosNovo;
+        internal GroupBox gbImportacao;
     }
 }

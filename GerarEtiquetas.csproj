@@ -9,9 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
     <PackageReference Include="ceTe.DynamicPDF.CoreSuite.NET" Version="12.17.0" />
     <PackageReference Include="ClosedXML" Version="0.102.2" />
     <PackageReference Include="Google.Apis.Drive.v3" Version="1.68.0.3428" />
+    <PackageReference Include="Microsoft.Graph" Version="5.56.0" />
+    <PackageReference Include="Microsoft.Graph.Core" Version="3.1.13" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.61.3" />
+    <PackageReference Include="Microsoft.Kiota.Abstractions" Version="1.9.9" />
     <PackageReference Include="QRCoder" Version="1.5.1" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.5" />
     <PackageReference Include="System.Management" Version="8.0.0" />
